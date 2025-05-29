@@ -1,0 +1,34 @@
+version: '3.9'
+services:
+  db:
+    image: postgres:14
+    restart: always
+    environment:
+      POSTGRES_DB: dentistry
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+
+  backend:
+    build: ./backend
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@db:5432/dentistry
+      JWT_SECRET: superjwtsecret123
+      TELEGRAM_TOKEN: your_telegram_bot_token_here
+    ports:
+      - '4000:4000'
+
+  frontend:
+    build: ./frontend
+    depends_on:
+      - backend
+    ports:
+      - '5173:5173'
+
+volumes:
+  dbdata:
